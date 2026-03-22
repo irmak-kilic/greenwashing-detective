@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Greenwashing Dedektifi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root{--bg:#070d07;--g:#39ff14;--gd:rgba(57,255,20,.5);--r:#ff4040;--y:#ffb800;--t:#e8f5e8;--m:#5a7a5a;--b:rgba(57,255,20,.12);--b2:rgba(57,255,20,.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;min-height:100vh;}
+#root{position:relative;z-index:1;}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fl{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes sc{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}
+.fu{animation:fu .5s ease both}
+.spin{animation:sp 1s linear infinite}
+.fl{animation:fl 2s ease infinite}
+.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 16px 48px;}
+.box{width:100%;max-width:620px;}
+.card{background:rgba(13,22,13,.9);border:1px solid var(--b);border-radius:14px;padding:22px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gd),transparent);}
+.inp{width:100%;background:rgba(57,255,20,.04);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--t);font-family:'DM Mono',monospace;font-size:13px;outline:none;transition:.2s;}
+.inp:focus{border-color:var(--gd);background:rgba(57,255,20,.07);}
+.inp::placeholder{color:var(--m);}
+select.inp{cursor:pointer;}
+textarea.inp{resize:vertical;min-height:90px;}
+.btn{border:none;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.04em;transition:.2s;}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.bp{background:var(--g);color:var(--bg);padding:14px;font-size:14px;width:100%;}
+.bp:hover:not(:disabled){opacity:.85;transform:translateY(-1px);}
+.bg{background:transparent;border:1px solid var(--b2);color:var(--t);padding:11px 20px;font-size:13px;}
+.bg:hover{background:rgba(57,255,20,.07);}
+.bsm{padding:7px 14px;font-size:12px;}
+.lbl{display:block;font-family:'DM Mono',monospace;font-size:11px;color:var(--m);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.bdg{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;}
+.br{background:rgba(255,64,64,.15);border:1px solid rgba(255,64,64,.3);color:var(--r);}
+.by{background:rgba(255,184,0,.15);border:1px solid rgba(255,184,0,.3);color:var(--y);}
+.bgg{background:rgba(57,255,20,.12);border:1px solid rgba(57,255,20,.25);color:var(--g);}
+.bm{background:rgba(255,255,255,.05);border:1px solid var(--b);color:var(--m);}
+.div{height:1px;background:var(--b);margin:16px 0;}
+.stit{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--m);margin-bottom:12px;}
+.mono{font-family:'DM Mono',monospace;font-size:12px;}
+.bar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(7,13,7,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--b);}
+.logo{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:.05em;color:var(--g);cursor:pointer;display:flex;align-items:center;gap:8px;}
+.nb{background:none;border:none;cursor:pointer;color:var(--m);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:5px 10px;border-radius:6px;transition:.2s;}
+.nb:hover{color:var(--g);background:rgba(57,255,20,.07);}
+.scan{position:fixed;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(57,255,20,.18),transparent);animation:sc 4s linear infinite;pointer-events:none;z-index:50;}
+.si{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:10px;border:1px solid transparent;transition:.4s;}
+.si.ac{border-color:var(--b2);background:rgba(57,255,20,.05);}
+.si.dn{opacity:.4;}
+.si.wt{opacity:.15;}
+.ring{position:relative;width:88px;height:88px;flex-shrink:0;}
+.ring svg{transform:rotate(-90deg);}
+.rv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.tact{border-left:2px solid rgba(255,64,64,.35);padding-left:14px;margin-bottom:14px;}
+.tact:last-child{margin-bottom:0;}
+.hist{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:8px;border:1px solid var(--b);cursor:pointer;transition:.2s;margin-bottom:8px;}
+.hist:hover{border-color:var(--b2);background:rgba(57,255,20,.04);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(255,64,64,.15);border:1px solid rgba(255,64,64,.4);color:#ff8080;padding:10px 18px;border-radius:10px;font-family:'DM Mono',monospace;font-size:12px;z-index:200;max-width:90vw;text-align:center;animation:fu .3s ease both;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:99px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script id="demo-data" type="application/json">
+{
+  "shell":{"sirket_adi":"Shell","sektor":"Enerji / Petrokimya","verdict":"Greenwashing","manipulasyon_skoru":82,"ozet":"Shell 2050 net sifir hedefini one cikarirken fosil yakit yatirimlarini rekor duzeyde artirmaya devam etmektedir. Scope 3 emisyonlari toplam etkinin yuzde doksanini olusturmasina ragmen hedeflerin disinda tutulmaktadir.","tespit_edilen_taktikler":[{"taktik":"Future-Tense Promises","aciklama":"2050 net sifir hedefi somut 2030 ara hedefleri olmadan aciklanmistir.","kanit":"Net Zero by 2050 ambition without 2030 milestones","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Satilan yakitin yakilmasindan kaynaklanan emisyonlar hedeflerin disinda birakilmistir.","kanit":"Scope 3 Category 11 excluded from net zero target","agirlik":3},{"taktik":"Carbon Offset Overreliance","aciklama":"Net sifir plani buyuk olcude karbon offset ve orman projelerine dayanmaktadir.","kanit":"Nature-based solutions as primary mechanism","agirlik":3},{"taktik":"Relative vs Absolute Targets","aciklama":"Emisyon yogunlugu hedefleri aciklanmakta, mutlak azaltim hedeflenmemektedir.","kanit":"Net Carbon Intensity reduction targets","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Scope 3 Raporlamasi","durum":"Eksik","aciklama":"Satilan urunlerin kullanim emisyonlari hic raporlanmamaktadir."},{"baslik":"Yenilenebilir Enerji Capex","durum":"Eksik","aciklama":"Toplam capexi in yalnizca yuzde on u dusuk karbonlu urunlere ayrilmaktadir."},{"baslik":"2030 Mutlak Hedef","durum":"Eksik","aciklama":"Mutlak emisyon azaltim taahhudu bulunmamaktadir."}],"eksik_bilgiler":["Scope 3 mutlak emisyon verisi","Yenilenebilir enerji capex orani","Fosil yakit azaltim takvimi"],"gercek_soru":"Shell rafinerik kapasitesini artirirken 2050 karbon nötr hedefine nasil ulaşmayi planlamaktadir?","_sources":[{"title":"Shell Sustainability Report","url":"https://reports.shell.com"},{"title":"CDP Shell Score","url":"https://www.cdp.net"}]},
+  "zara":{"sirket_adi":"Zara","sektor":"Tekstil / Hizli Moda","verdict":"Greenwashing","manipulasyon_skoru":76,"ozet":"Zara Join Life koleksiyonu ve surdurulebilirlik iddialari hizli moda is modelinin dogasiyla dogrudan celismektedir. Yillik milyarlarca parca uretimi surdurulerken yapilan yesil pazarlama tüketiciyi yaniltma riski tasimaktadir.","tespit_edilen_taktikler":[{"taktik":"Vague Language","aciklama":"Join Life ve daha surdurulebilir malzemeler gibi ifadeler olculebilir kriter icermemektedir.","kanit":"Made with more sustainable materials","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zinciri emisyonlari toplam etkinin yuzde sekseninden fazlasini olusturmaktadir.","kanit":"Supply chain transparency reports incomplete","agirlik":3},{"taktik":"Missing Baselines","aciklama":"Surdurulebilirlik hedefleri icin referans yil aciklanmamistir.","kanit":"Targets stated without baseline year","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Tedarik Zinciri Izlenebilirlik","durum":"Eksik","aciklama":"Uretim tesisleri ve tedarikci bilgileri paylasılmamaktadir."},{"baslik":"GOTS Sertifikasyonu","durum":"Eksik","aciklama":"Uluslararasi tekstil surdurulebilirlik sertifikasyonu bulunmamaktadir."},{"baslik":"Su Tuketimi Hedefi","durum":"Eksik","aciklama":"Uretim su tuketimi icin somut hedef yoktur."}],"eksik_bilgiler":["Tedarik zinciri fabrika listesi","Su tuketimi mutlak hedef","Geri donusturulmus malzeme orani"],"gercek_soru":"Zara yilda milyarlarca parca uretimine devam ederken nasil surdurulebilir olabilir?","_sources":[{"title":"Inditex Annual Report","url":"https://www.inditex.com/investors"}]},
+  "h&m":{"sirket_adi":"H&M","sektor":"Tekstil / Hizli Moda","verdict":"Greenwashing","manipulasyon_skoru":79,"ozet":"H&M Conscious koleksiyonu nedeniyle Norvec tuketici otoritesinden uyari almis ve birden fazla ulkede yasal islemle karsilasmistir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Conscious etiketi tuketicilerin urunlerin surdurulebilir oldugunu dusunmesine yol acmakta ancak yasal tanimlara uymamaktadir.","kanit":"Norwegian Consumer Authority ruling 2022","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zinciri emisyonlari icin kapsamli hedefler bulunmamaktadir.","kanit":"Scope 3 targets incomplete","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Yasal Uyum","durum":"Eksik","aciklama":"Norvec ve Hollanda tuketici otoriteleri yaniltici bulmustur."},{"baslik":"Tekstil Atigi","durum":"Eksik","aciklama":"Toplanan kiyafetlerin yuzde birinden azi yeni urune donusturulmektedir."}],"eksik_bilgiler":["Scope 3 mutlak emisyon hedefi","Geri donusum orani"],"gercek_soru":"H&M hangi bagimsiz kurumun onayladiği bir surdurulebilirlik standardini karsilamaktadir?","_sources":[{"title":"Norwegian Consumer Authority","url":"https://www.forbrukertilsynet.no/english"}]},
+  "bp":{"sirket_adi":"BP","sektor":"Enerji / Petrokimya","verdict":"Greenwashing","manipulasyon_skoru":78,"ozet":"Beyond Petroleum yeniden markalamasinin ardindan BP fosil yakit yatirimlarini artirmistir. 2023 strateji degisikligi iklim taahhutlerini ciddi sarsmistir.","tespit_edilen_taktikler":[{"taktik":"Future-Tense Promises","aciklama":"2050 net sifir taahhudu 2023 te geri adim atilmasiyla celismektedir.","kanit":"BP reversed renewable energy targets in 2023","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Satilan yakitlarin yakilmasindan kaynaklanan Scope 3 hedeflerde yetersiz ele alinmaktadir.","kanit":"Scope 3 Category 11 targets weakened","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji Hedefleri","durum":"Eksik","aciklama":"2023 te yenilenebilir hedefler dusuruldu, fosil yakit artirildi."},{"baslik":"Scope 3 Mutlak Hedef","durum":"Eksik","aciklama":"Satilan urunlerin kullanimi icin mutlak hedef yetersizdir."}],"eksik_bilgiler":["2030 icin mutlak Scope 3 azaltim hedefi","Yenilenebilir enerji yillik yatirim rakami"],"gercek_soru":"BP 2023 te yenilenebilir hedeflerini neden dusurdu?","_sources":[{"title":"BP Annual Report","url":"https://www.bp.com/investors"}]},
+  "orsted":{"sirket_adi":"Orsted","sektor":"Enerji / Petrokimya","verdict":"Temiz","manipulasyon_skoru":18,"ozet":"Orsted komur agirlikli bir enerji sirketinden dunyanin en buyuk acik deniz ruzgar enerjisi ureticisine donusmustur. Scope 1 ve 2 emisyonlarini yuzde seksen alti azaltmayi basaran sirket gercek donusumun mumkun oldugunu kanitlamaktadir.","tespit_edilen_taktikler":[{"taktik":"Missing Baselines","aciklama":"Bazi tedarik zinciri metrikleri icin tarihsel referans noktalari daha kapsamli olabilir.","kanit":"Scope 3 supply chain partially reported","agirlik":1}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji Donusumu","durum":"Mevcut","aciklama":"2012 de yuzde seksen bes fosil olan uretim 2023 te yuzde doksan yenilenebilire donusmustür."},{"baslik":"Scope 1-2 Azaltimi","durum":"Mevcut","aciklama":"1990 tabanindan yuzde seksen alti mutlak azaltim bagimsiz olarak dogrulanmistir."},{"baslik":"SBTi Onay","durum":"Mevcut","aciklama":"Bilim tabanlı hedefler onaylanmistir."}],"eksik_bilgiler":["Tedarik zinciri Scope 3 kategorileri"],"gercek_soru":"Orsted in tedarik zinciri net sifir hesabina tam olarak dahil edildiginde tablo nasil degismektedir?","_sources":[{"title":"Orsted Sustainability Report","url":"https://orsted.com/sustainability"},{"title":"SBTi Orsted","url":"https://sciencebasedtargets.org"}]},
+  "patagonia":{"sirket_adi":"Patagonia","sektor":"Tekstil / Hizli Moda","verdict":"Temiz","manipulasyon_skoru":22,"ozet":"Patagonia onarim kulturu B Corp sertifikasyonu ve seffaf tedarik zinciri raporlamasiyla tekstil sektorunde gercek surdurulebilirligin mumkun oldugunu gostermektedir.","tespit_edilen_taktikler":[{"taktik":"Missing Baselines","aciklama":"Bazi cevre metriklerinde tarihsel karsilastirma noktalari daha kapsamli sunulabilir.","kanit":"Some metrics lack multi-year trend data","agirlik":1}],"sektor_kirmizi_cizgiler":[{"baslik":"B Corp Sertifikasyonu","durum":"Mevcut","aciklama":"Bagimsiz B Lab denetimi ile dogrulanmis."},{"baslik":"Tedarik Zinciri","durum":"Mevcut","aciklama":"Tum birinci ve ikinci kademe tedarikçiler paylasılmaktadir."},{"baslik":"Onarim Programi","durum":"Mevcut","aciklama":"Worn Wear programiyla onarim ve takas desteklenmektedir."}],"eksik_bilgiler":["Scope 3 kategori bazli raporlama"],"gercek_soru":"Patagonia buyume hedefleri uzun vadede onarim ve azaltim odakli is modeliyle surdurulebilir mi?","_sources":[{"title":"Patagonia Environmental Responsibility","url":"https://www.patagonia.com/our-footprint/"},{"title":"B Corp Profile","url":"https://www.bcorporation.net"}]},
+  "tupras":{"sirket_adi":"Tupras","sektor":"Enerji / Petrokimya","verdict":"Greenwashing","manipulasyon_skoru":74,"ozet":"Tupras Turkiye nin en buyuk sanayi kurulusu olarak karbon emisyonlarini azaltma taahhudu yaparken rafinerik kapasitesini genisletmeye devam etmektedir.","tespit_edilen_taktikler":[{"taktik":"Future-Tense Promises","aciklama":"2050 karbon notr hedefi somut 2030 ara hedefleri olmadan aciklanmistir.","kanit":"Carbon neutral 2050 without milestones","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Satilan petrol urunlerinin kullanim emisyonlari raporlanmamaktadir.","kanit":"Scope 3 Category 11 not disclosed","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Scope 3 Raporlama","durum":"Eksik","aciklama":"Satilan urunlerin kullanim emisyonlari hic raporlanmamaktadir."},{"baslik":"2030 Mutlak Hedef","durum":"Eksik","aciklama":"Mutlak azaltim taahhudu bulunmamaktadir."}],"eksik_bilgiler":["Scope 3 mutlak emisyon verisi","Yenilenebilir enerji capex orani"],"gercek_soru":"Tupras rafinerik kapasitesini artirirken 2050 karbon notr hedefine nasil ulasmayi planlamaktadir?","_sources":[{"title":"Tupras Surdurulebilirlik","url":"https://www.tupras.com.tr/surdurulebilirlik"}]},
+  "arcelik":{"sirket_adi":"Arcelik","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":44,"ozet":"Arcelik sektorde gorece guclu surdurulebilirlik performansi sergilemekte ve SBTi onayli hedeflere sahip bulunmaktadir. Ancak Scope 3 urun kullanim fazi ve tedarik zinciri emisyonlari yetersiz ele alinmaktadir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Satilan cihazlarin kullanim fazindaki enerji tuketimi Scope 3 raporlamasinda yer almamaktadir.","kanit":"Product use phase Scope 3 partially reported","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"SBTi Onay","durum":"Mevcut","aciklama":"Bilim tabanlı emisyon azaltim hedefleri SBTi tarafindan onaylanmistir."},{"baslik":"E-Atik Yonetimi","durum":"Kısmen","aciklama":"Geri alma programlari mevcut ancak oranlar raporlanmamaktadir."}],"eksik_bilgiler":["Urun kullanim fazi Scope 3 mutlak hedef"],"gercek_soru":"Arcelik in sattigi milyonlarca cihazin omur boyu enerji tuketimi icin ne yapilmaktadir?","_sources":[{"title":"Arcelik Surdurulebilirlik","url":"https://www.arcelikglobal.com/tr/surdurulebilirlik/"}]},
+  "thy":{"sirket_adi":"Turk Hava Yollari","sektor":"Turizm / Havacılık","verdict":"Greenwashing","manipulasyon_skoru":68,"ozet":"THY hizli filo genislemesiyle mutlak emisyonlarini artirirken karbon verimliligi hedeflerini one cikarmaktadir. SAF kullanimi sembolik duzeyde kalmaktadir.","tespit_edilen_taktikler":[{"taktik":"Relative vs Absolute Targets","aciklama":"Yolcu basina emisyon hedefleri aciklanmakta ancak artan ucus sayisiyla mutlak emisyonlar yukselmektedir.","kanit":"CO2 per passenger km targets vs total growth","agirlik":3},{"taktik":"Carbon Offset Overreliance","aciklama":"Karbon dengeleme programi gercek emisyon azaltimi yerine offset satin almaya dayanmaktadir.","kanit":"Carbon offset program as primary climate action","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"SAF Kullanim Orani","durum":"Eksik","aciklama":"SAF kullanimi toplam yakitin yuzde birinden dusuk duzeydedir."},{"baslik":"Mutlak Emisyon Hedefi","durum":"Eksik","aciklama":"Mutlak emisyon azaltim hedefi bulunmamaktadir."}],"eksik_bilgiler":["SAF yillik alim hacmi","Mutlak emisyon takvimi"],"gercek_soru":"THY filo buyumesini surdururken mutlak emisyonlarini nasil azaltmayi planlamaktadir?","_sources":[{"title":"THY Surdurulebilirlik","url":"https://www.turkishairlines.com/tr-tr/basin/kurumsal-sorumluluk/"}]},
+  "garanti":{"sirket_adi":"Garanti BBVA","sektor":"Finans / Bankacılık","verdict":"Şüpheli","manipulasyon_skoru":48,"ozet":"Garanti BBVA Turk bankacilik sektorunde one cikan kurumlardan biridir. Ancak finanse edilen emisyonlar bankanin iklim etkisinin buyuk cogunlugunu olusturmasina ragmen yeterince raporlanmamaktadir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Finanse edilen emisyonlar toplam iklim etkisinin yuzde doksanbesinden fazlasini olusturmaktadir.","kanit":"Financed emissions not in net zero target","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Finanse Edilen Emisyonlar","durum":"Eksik","aciklama":"Scope 3 Kategori 15 kapsamli olarak raporlanmamaktadir."},{"baslik":"TCFD Uyumu","durum":"Kısmen","aciklama":"TCFD raporlamasi mevcut ancak senaryo analizleri sinirlidir."}],"eksik_bilgiler":["Fosil yakit portfoyu azaltim takvimi","Sektör bazli finanse edilen emisyon verileri"],"gercek_soru":"Garanti BBVA nin finanse ettigi projelerin toplam karbon etkisi 1.5 derece senaryosuyla uyumlu mudur?","_sources":[{"title":"Garanti BBVA Surdurulebilirlik","url":"https://www.garantibbva.com.tr/tr/hakkimizda/surdurulebilirlik.html"}]},
+  "akbank":{"sirket_adi":"Akbank","sektor":"Finans / Bankacılık","verdict":"Şüpheli","manipulasyon_skoru":51,"ozet":"Akbank Net Sifir Bankacilik Ittifaki uyesi olmakla birlikte finanse edilen emisyonlarin raporlanmasinda somut adimlar yetersizdir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Finanse edilen emisyonlar kapsamli sekilde olculememektedir.","kanit":"Financed emissions methodology incomplete","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"NZBA Uyeligil","durum":"Mevcut","aciklama":"Net Sifir Bankacilik Ittifaki uyesidir."},{"baslik":"Finanse Edilen Emisyonlar","durum":"Eksik","aciklama":"Scope 3 Kategori 15 icin kapsamli hedef bulunmamaktadir."}],"eksik_bilgiler":["Sektor bazli finanse edilen emisyon hedefleri"],"gercek_soru":"Akbank hangi sektorlerdeki finanse edilen emisyonlari ne zaman azaltacaktir?","_sources":[{"title":"Akbank Surdurulebilirlik","url":"https://www.akbank.com/tr-tr/sayfalar/surdurulebilirlik.aspx"}]},
+  "turkcell":{"sirket_adi":"Turkcell","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":42,"ozet":"Turkcell telekomunikasyon sektorunde gorece iyi surdurulebilirlik performansi sergilemekte ve yenilenebilir enerji kullanimini artirmaktadir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Musteri cihazlarinin kullanim emisyonlari raporlanmamaktadir.","kanit":"Customer device use phase not in targets","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji","durum":"Kısmen","aciklama":"Yenilenebilir enerji orani artmakta ancak yuzde yuz hedefi icin takvim netlesmemistir."},{"baslik":"E-Atik","durum":"Kısmen","aciklama":"Geri toplama programlari mevcut ancak oranlar raporlanmamaktadir."}],"eksik_bilgiler":["E-atik geri donusum orani","Scope 3 musteri cihaz kullanim emisyonlari"],"gercek_soru":"Turkcell in sattigi milyonlarca cihazin omur boyu etkisi icin hangi sorumluluk mekanizmalari mevcuttur?","_sources":[{"title":"Turkcell Surdurulebilirlik","url":"https://www.turkcell.com.tr/surdurulebilirlik"}]},
+  "bim":{"sirket_adi":"BIM","sektor":"Perakende","verdict":"Şüpheli","manipulasyon_skoru":58,"ozet":"BIM Turk perakende sektorunde surdurulebilirlik raporlamasinda uluslararasi rakiplerin gerisinde kalmaktadir.","tespit_edilen_taktikler":[{"taktik":"Third-Party Verification Absent","aciklama":"Cevresel iddialar bagimsiz taraflarca dogrulanmamaktadir.","kanit":"No CDP submission","agirlik":3},{"taktik":"Vague Language","aciklama":"Cevreye saygi ifadesi olculebilir hedef icermemektedir.","kanit":"Environmentally respectful operations","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Plastik Azaltimi","durum":"Eksik","aciklama":"Mutlak plastik azaltim hedefi bulunmamaktadir."},{"baslik":"CDP Raporlama","durum":"Eksik","aciklama":"CDP ye emisyon raporu sunulmamaktadir."}],"eksik_bilgiler":["Yillik plastik kullanim ve azaltim hedefi","Gida israfi verisi"],"gercek_soru":"BIM in binlerce magazasinin toplam karbon ayak izi nedir?","_sources":[{"title":"BIM Kurumsal Sorumluluk","url":"https://www.bim.com.tr/categories/kurumsal-sorumluluk/"}]},
+  "migros":{"sirket_adi":"Migros","sektor":"Perakende","verdict":"Şüpheli","manipulasyon_skoru":46,"ozet":"Migros Turk perakende sektorunde BIM e kiyasla daha kapsamli raporlama yapmaktadir. Tedarik zinciri Scope 3 ve plastik azaltiminda mutlak hedefler eksiktir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zinciri Scope 3 emisyonlari raporlanmamaktadir.","kanit":"Supply chain not fully reported","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Plastik Azaltimi","durum":"Kısmen","aciklama":"Poset azaltimi yapilmis ancak mutlak hedef yok."},{"baslik":"Gida Israfi","durum":"Kısmen","aciklama":"Gida bagisi programlari mevcut."}],"eksik_bilgiler":["Tedarik zinciri Scope 3","Toplam plastik ambalaj azaltim hedefi"],"gercek_soru":"Migros un tedarik zincirindeki gida uretiminin cevresel etkisi nasil olculmektedir?","_sources":[{"title":"Migros Surdurulebilirlik","url":"https://www.migroskurumsal.com/surdurulebilirlik"}]},
+  "vestel":{"sirket_adi":"Vestel","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":53,"ozet":"Vestel elektronik uretiminde enerji verimliligi calismasi yurutmektedir. Urun kullanim fazi Scope 3 ve e-atik yonetimi konusunda uluslararasi standartlarin gerisindedir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Satilan cihazlarin kullanim fazindaki enerji tuketimi raporlanmamaktadir.","kanit":"Product use phase Scope 3 not reported","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Urun Kullanim Scope 3","durum":"Eksik","aciklama":"Satilan cihazlarin omur boyu emisyonlari raporlanmamaktadir."},{"baslik":"SBTi","durum":"Eksik","aciklama":"Bilim tabanlı emisyon hedefi alinmamistir."}],"eksik_bilgiler":["Urun kullanim Scope 3","E-atik geri donusum orani"],"gercek_soru":"Vestel in sattigi milyonlarca cihazin omur boyu karbon etkisi nedir?","_sources":[{"title":"Vestel Surdurulebilirlik","url":"https://www.vestelelectronics.com/tr/kurumsal/surdurulebilirlik"}]},
+  "lcwaikiki":{"sirket_adi":"LC Waikiki","sektor":"Tekstil / Hizli Moda","verdict":"Greenwashing","manipulasyon_skoru":71,"ozet":"LC Waikiki hizli moda is modelini surdururken surdurulebilir koleksiyonlar one cikarmaktadir. Tedarik zinciri ve Scope 3 konusunda uluslararasi standartlarin cok gerisindedir.","tespit_edilen_taktikler":[{"taktik":"Vague Language","aciklama":"Daha surdurulebilir malzemeler iddialari olculebilir standart icermemektedir.","kanit":"More sustainable materials without certification","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zinciri emisyonlari raporlanmamaktadir.","kanit":"Supply chain Scope 3 not disclosed","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Tedarik Zinciri Izlenebilirlik","durum":"Eksik","aciklama":"Uretim tesisleri paylasılmamaktadir."},{"baslik":"GOTS Sertifikasyonu","durum":"Eksik","aciklama":"Uluslararasi tekstil sertifikasyonu bulunmamaktadir."}],"eksik_bilgiler":["Tedarik zinciri fabrika listesi","Su tuketimi hedefi"],"gercek_soru":"LC Waikiki yilda kac parca uretiyor ve bu uretimin maliyeti nedir?","_sources":[{"title":"LC Waikiki Sorumluluk","url":"https://www.lcwaikiki.com/tr-TR/TR/c/surdurulebilirlik"}]},
+  "mavi":{"sirket_adi":"Mavi","sektor":"Tekstil / Hizli Moda","verdict":"Şüpheli","manipulasyon_skoru":47,"ozet":"Mavi Turk denim sektorunde su tasarrufu teknolojileriyle dikkat cekmektedir. Scope 3 ve tedarik zinciri alt katmanlari seffafligi yetersizdir.","tespit_edilen_taktikler":[{"taktik":"Cherry-Picked Metrics","aciklama":"Su tasarruflu teknoloji one cikarilirken hammadde asamasindaki su tuketimi geri planda kalmaktadir.","kanit":"XFlow water saving highlighted vs full lifecycle","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Su Tasarrufu","durum":"Mevcut","aciklama":"XFlow ile olculebilir azaltim saglanmaktadir."},{"baslik":"Scope 3 Tarimsal","durum":"Eksik","aciklama":"Pamuk tarimi emisyonlari raporlanmamaktadir."}],"eksik_bilgiler":["Pamuk tarimi Scope 3","Toplam su tuketimi hedefi"],"gercek_soru":"Mavi nin tam yasam dongusu su ayak izi nedir?","_sources":[{"title":"Mavi Surdurulebilirlik","url":"https://www.mavi.com/surdurulebilirlik"}]},
+  "exxon":{"sirket_adi":"ExxonMobil","sektor":"Enerji / Petrokimya","verdict":"Greenwashing","manipulasyon_skoru":88,"ozet":"ExxonMobil onlarca yil boyunca iklim bilimini bilerek gizlemis ve yaniltici reklamlar nedeniyle FTC sorusturmasiyla karsilasmistir. Net sifir taahhudu sektorun en zayflarindan biridir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"ExxonMobil in kendi arastirmalari 1970 lerden itibaren iklim degisikligini dogrularken sirket kamuoyunu yaniltmistir.","kanit":"Internal research vs public denial of climate science","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Satilan fosil yakitlarin yakilmasi Scope 3 net sifir planinin tamamen disindadir.","kanit":"Scope 3 excluded from net zero target","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Scope 3 Raporlama","durum":"Eksik","aciklama":"Satilan yakitlarin yakilma emisyonlari hicbir hedefte yer almamaktadir."},{"baslik":"Yenilenebilir Yatirim","durum":"Eksik","aciklama":"Toplam capex icinde yenilenebilir enerji payi yuzde birden dusuktur."}],"eksik_bilgiler":["Scope 3 mutlak emisyon hedefi","Fosil yakit azaltim takvimi"],"gercek_soru":"ExxonMobil kendi arastirmalarinin 50 yil once ortaya koydugu iklim riskini neden kamuoyundan gizledi?","_sources":[{"title":"ExxonMobil Climate","url":"https://www.exxonmobil.com/environment"}]},
+  "amazon":{"sirket_adi":"Amazon","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":61,"ozet":"Amazon The Climate Pledge ile 2040 net sifir taahhudu yaparken veri merkezleri ve kargo lojistigi emisyonlari hizla artmaktadir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Marketplace saticilarin Scope 3 emisyonlari yetersiz raporlanmaktadir.","kanit":"Third-party seller emissions excluded","agirlik":3},{"taktik":"Carbon Offset Overreliance","aciklama":"Offset portfoyu gercek emisyon azaltiminin onune gecmektedir.","kanit":"Large offset portfolio vs reduction pace","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Marketplace Emisyonlar","durum":"Eksik","aciklama":"Ucuncu taraf saticilarin tedarik zinciri emisyonlari kapsam disindadir."},{"baslik":"Lojistik Scope 3","durum":"Kısmen","aciklama":"Teslimat emisyonlari kismi raporlanmaktadir."}],"eksik_bilgiler":["Marketplace satici Scope 3","Veri merkezi mutlak enerji buyumesi"],"gercek_soru":"Amazon veri merkezleri ve kargo operasyonlari buyurken net sifir hedefi nasil gerceklesecektir?","_sources":[{"title":"Amazon Sustainability","url":"https://sustainability.aboutamazon.com/"}]},
+  "google":{"sirket_adi":"Google","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":39,"ozet":"Google 2007 den bu yana karbon notr oldugunu ve 2030 da karbonsuz enerjiyle calısmayi hedefledigini aciklamaktadir. AI nin buyumesiyle artan veri merkezi enerji talep kaygilari gundemededir.","tespit_edilen_taktikler":[{"taktik":"Carbon Offset Overreliance","aciklama":"Gecmisteki karbon notrlik iddialari buyuk olcude offset satin alimina dayanmaktaydi.","kanit":"Historical carbon neutrality via offsets","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji","durum":"Mevcut","aciklama":"2030 da 7/24 karbonsuz enerji hedefi somut yatirimlarla desteklenmektedir."},{"baslik":"Su Tuketimi","durum":"Kısmen","aciklama":"Veri merkezi su tuketimi raporlanmakta ancak AI buyumesi icin hedef yetersizdir."}],"eksik_bilgiler":["AI is yuklerinin ayri emisyon raporu","Veri merkezi su tuketimi azaltim hedefi"],"gercek_soru":"Google un AI altyapisi hizli buyumesi 2030 karbonsuz enerji hedefiyle nasil bagdasmaktadir?","_sources":[{"title":"Google Sustainability","url":"https://sustainability.google/"}]},
+  "microsoft":{"sirket_adi":"Microsoft","sektor":"Teknoloji","verdict":"Temiz","manipulasyon_skoru":24,"ozet":"Microsoft 2030 karbon negatif ve 2050 ye kadar tum tarihsel emisyonlari giderme taahhuduyle sektorun en iddiali iklim hedeflerine sahip sirketlerden biridir.","tespit_edilen_taktikler":[{"taktik":"Missing Baselines","aciklama":"Bazi tedarik zinciri Scope 3 kategorilerinde veri eksikligi surmektedir.","kanit":"Supply chain Scope 3 data gaps acknowledged","agirlik":1}],"sektor_kirmizi_cizgiler":[{"baslik":"Karbon Negatif Hedef","durum":"Mevcut","aciklama":"2030 karbon negatif taahhudu somut yatirimlarla desteklenmektedir."},{"baslik":"SBTi Onay","durum":"Mevcut","aciklama":"Bilim tabanlı hedefler onaylanmistir."},{"baslik":"Seffaf Raporlama","durum":"Mevcut","aciklama":"Yillik ayrintili surdurulebilirlik raporu paylasılmaktadir."}],"eksik_bilgiler":["Tum tedarik zinciri Scope 3 kategorileri"],"gercek_soru":"Microsoft un AI altyapisi genislemesi 2030 karbon negatif hedefiyle tutarli mi?","_sources":[{"title":"Microsoft Sustainability","url":"https://www.microsoft.com/en-us/corporate-responsibility/sustainability"}]},
+  "apple":{"sirket_adi":"Apple","sektor":"Teknoloji","verdict":"Şüpheli","manipulasyon_skoru":45,"ozet":"Apple 2030 da tum deger zinciriyle karbon notr olmayı hedeflemektedir. Ancak karbon notr urun iddialari UK ASA tarafindan yaniltici bulunarak yasaklanmistir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Carbon neutral Apple Watch reklamlari UK ASA tarafindan yaniltici bulunarak yasaklanmistir.","kanit":"UK ASA banned carbon neutral Apple Watch ads 2023","agirlik":3},{"taktik":"Carbon Offset Overreliance","aciklama":"Urun bazli karbon notrlik buyuk olcude offset portfoyune dayanmaktadir.","kanit":"Carbon neutrality relies heavily on offsets","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji","durum":"Mevcut","aciklama":"Sirket operasyonlari yuzde yuz yenilenebilir enerjiyle calismaktadir."},{"baslik":"Urun Karbon Notrlik","durum":"Eksik","aciklama":"UK ASA carbon neutral urun reklamlarini yaniltici bulmustur."}],"eksik_bilgiler":["Urun karbon notrlik metodolojisi","Offset kalite dogrulamasi"],"gercek_soru":"Apple in karbon notr urun iddiasi hangi bagimsiz standarda dayanmaktadir?","_sources":[{"title":"Apple Environmental","url":"https://www.apple.com/environment/"},{"title":"UK ASA Apple","url":"https://www.asa.org.uk/"}]},
+  "nestle":{"sirket_adi":"Nestle","sektor":"Gida / Tarim","verdict":"Greenwashing","manipulasyon_skoru":72,"ozet":"Nestle kendi ic belgelerinde portfoyunun yuzde altmisinin saglikli tanimi karsilamadigini kabul ederken saglikli imajini surdurmektedir. Plastikle savas actigini duyururken tek kullanimlik plastik uretiminin en buyuk sirketlerinden biri olmaktadir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Nestle nin ic belgelerine gore portfoyunun yuzde altmisi saglikli tanimini karsilamamaktadir.","kanit":"Internal documents: 60% of portfolio fails health criteria","agirlik":3},{"taktik":"Future-Tense Promises","aciklama":"Plastik azaltim taahhudu somut yillik hedefler olmadan aciklanmistir.","kanit":"Plastic reduction pledges without annual milestones","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Plastik Azaltimi","durum":"Kısmen","aciklama":"Bazi programlar mevcut ancak mutlak plastik azaltimi yetersizdir."},{"baslik":"Su Tuketimi","durum":"Eksik","aciklama":"Su kaynaklarina erisim tartismalari yeterince raporlanmamaktadir."}],"eksik_bilgiler":["Mutlak plastik kullanim azaltim takvimi","Urun portfoyu saglik skoru metodolojisi"],"gercek_soru":"Nestle kendi ic belgelerinin sagliksiz oldugunu kabul ettigi urunleri neden besleyici olarak pazarlamaktadir?","_sources":[{"title":"Nestle Sustainability","url":"https://www.nestle.com/sustainability"}]},
+  "cocacola":{"sirket_adi":"Coca-Cola","sektor":"Gida / Tarim","verdict":"Greenwashing","manipulasyon_skoru":75,"ozet":"Coca-Cola plastikle savastigini duyururken dunyanin en buyuk plastik kirleticisi olmayı surdurmektedir. Break Free From Plastic raporlarinda yedi yil ust uste birinci siradadir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Coca-Cola World Without Waste kampanyasini surdururken yillik 3 milyon ton plastik uretmektedir.","kanit":"World Without Waste vs 3M tonnes plastic per year","agirlik":3},{"taktik":"Cherry-Picked Metrics","aciklama":"Geri donusturulmus icerik orani one cikarilirken toplam plastik miktari gizlenmektedir.","kanit":"rPET percentage highlighted vs total plastic volume","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Mutlak Plastik Azaltimi","durum":"Eksik","aciklama":"Yillik uretilen toplam plastik miktari azalmamaktadir."},{"baslik":"Plastik Kirliligi Sorumlulugu","durum":"Eksik","aciklama":"Uretici sorumlulugu kapsaminda kabul edilmemektedir."}],"eksik_bilgiler":["Yillik mutlak plastik uretim azaltim hedefi"],"gercek_soru":"Coca-Cola World Without Waste taahhudu kapsaminda yillik plastik uretimini ne zaman azaltmayi planliyor?","_sources":[{"title":"Coca-Cola Sustainability","url":"https://www.coca-colacompany.com/sustainability"},{"title":"Break Free From Plastic","url":"https://www.breakfreefromplastic.org/"}]},
+  "volkswagen":{"sirket_adi":"Volkswagen","sektor":"Otomotiv","verdict":"Greenwashing","manipulasyon_skoru":80,"ozet":"Volkswagen temiz dizel skandalindan sonra elektrikli arac donusumunu duyurmustur. Emisyon manipulasyonunun yillarca surdugu ortaya cikmis ve sirket 30 milyar dolar ceza odemistir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Volkswagen temiz dizel teknolojisini kasitli olarak yaniltici bicimdde pazarlamis, manipulasyon yazilimi kullanmistir.","kanit":"Dieselgate: defeat device software manipulating emissions tests","agirlik":3},{"taktik":"Cherry-Picked Metrics","aciklama":"EV satislari one cikarilirken toplam filo emisyonlari geri planda kalmaktadir.","kanit":"EV sales highlighted vs total ICE fleet size","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Emisyon Guvenilirlik","durum":"Eksik","aciklama":"Gecmis manipulasyon nedeniyle emisyon verilerinin guvenilirligi sorgulanabilir."},{"baslik":"EV Gecis Hizi","durum":"Kısmen","aciklama":"EV satis orani artiyor ancak toplam filo icindeki payi dusuktur."}],"eksik_bilgiler":["Bagimsiz emisyon dogrulama mekanizmasi"],"gercek_soru":"Volkswagen Dieselgate sonrasinda emisyon verilerini manipule etmeyecegini hangi bagimsiz mekanizmayla garanti etmektedir?","_sources":[{"title":"Volkswagen Sustainability","url":"https://www.volkswagen-group.com/en/sustainability-11750"},{"title":"EPA Dieselgate","url":"https://www.epa.gov/vw"}]},
+  "unilever":{"sirket_adi":"Unilever","sektor":"Gida / Tarim","verdict":"Şüpheli","manipulasyon_skoru":36,"ozet":"Unilever CDP A listesinde yer alan ve SBTi onaylli hedeflere sahip guclu bir surdurulebilirlik profili sergilemektedir. Ancak tedarik zinciri ormansizlasma taahhudu gecikti.","tespit_edilen_taktikler":[{"taktik":"Future-Tense Promises","aciklama":"Ormansizlasmasiz tedarik zinciri taahhudu defalarca ertelenmistir.","kanit":"Deforestation-free supply chain deadline extended multiple times","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"CDP A Listesi","durum":"Mevcut","aciklama":"Iklim su ve ormanlar icin CDP A listesinde yer almaktadir."},{"baslik":"SBTi Onay","durum":"Mevcut","aciklama":"Bilim tabanlı emisyon hedefleri onaylanmistir."},{"baslik":"Ormansizlasmasiz Tedarik","durum":"Kısmen","aciklama":"Hedef defalarca ertelenmistir."}],"eksik_bilgiler":["Ormansizlasmasiz tedarik kesin takvimi"],"gercek_soru":"Unilever palm yagi ve soya tedarik zincirindeki ormansizlasma taahhudu neden defalarca ertelendi?","_sources":[{"title":"Unilever Climate Action","url":"https://www.unilever.com/planet-and-society/climate-action/"}]},
+  "ikea":{"sirket_adi":"IKEA","sektor":"Perakende","verdict":"Şüpheli","manipulasyon_skoru":41,"ozet":"IKEA 2030 iklim pozitif olma hedefiyle guclu bir surdurulebilirlik taahhudu sergilemektedir. Ancak ahsap tedarik zincirindeki ormancilik uygulamalari tartismali olmaya devam etmektedir.","tespit_edilen_taktikler":[{"taktik":"Cherry-Picked Metrics","aciklama":"Yenilenebilir enerji one cikarilirken musteri kullanim emisyonlari geri planda kalmaktadir.","kanit":"Renewable energy highlighted","agirlik":1}],"sektor_kirmizi_cizgiler":[{"baslik":"Yenilenebilir Enerji","durum":"Mevcut","aciklama":"Operasyonlarda yuzde yuz yenilenebilir enerji hedefine yaklasılmaktadir."},{"baslik":"Ahsap Tedarik","durum":"Kısmen","aciklama":"FSC sertifikasyonu mevcut ancak tum tedarik zinciri kapsanmamaktadir."}],"eksik_bilgiler":["Ahsap tedarik zinciri ormansizlasma riski raporu"],"gercek_soru":"IKEA nin ahsap tedarik zinciri FSC sertifikali oldugu iddia edilen tum kaynaklarda gercekten dogrulanmis midir?","_sources":[{"title":"IKEA Sustainability","url":"https://www.ikea.com/global/en/our-business/people-planet/"}]},
+  "hsbc":{"sirket_adi":"HSBC","sektor":"Finans / Bankacılık","verdict":"Greenwashing","manipulasyon_skoru":73,"ozet":"HSBC 2050 net sifir taahhudu yaparken fosil yakit finansmanini artirmaya devam etmektedir. UK ASA HSBC nin yaniltici iklim reklamlarini yasaklamistir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"UK ASA HSBC nin agac ekme ve yesil finansman reklamlarini yaniltici bularak yasaklamistir.","kanit":"UK ASA banned HSBC climate ads 2022","agirlik":3},{"taktik":"Scope 3 Omissions","aciklama":"Finanse edilen emisyonlar net sifir taahudunde yetersiz ele alinmaktadir.","kanit":"Financed emissions underweighted in net zero","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Yaniltici Reklam","durum":"Eksik","aciklama":"UK ASA iklim reklamlarini yasaklamistir."},{"baslik":"Finanse Edilen Emisyonlar","durum":"Kısmen","aciklama":"NZBA uyesi olmakla birlikte sektör bazli hedefler yetersizdir."}],"eksik_bilgiler":["Sektor bazli finanse edilen emisyon hedefleri"],"gercek_soru":"HSBC fosil yakit finansmanini artirirken 2050 net sifir taahhudu nasil gerceklesecektir?","_sources":[{"title":"UK ASA HSBC Ruling","url":"https://www.asa.org.uk/"},{"title":"HSBC Climate","url":"https://www.hsbc.com/climate"}]},
+  "mcdonalds":{"sirket_adi":"McDonalds","sektor":"Gida / Tarim","verdict":"Greenwashing","manipulasyon_skoru":70,"ozet":"McDonalds 2050 net sifir taahhudu yaparken sigir eti tedarik zinciri ormansizlasma riski ve metan emisyonlari konusunda somut hedefler yetersizdir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Sigir eti tedarik zincirindeki metan emisyonlari McDonalds emisyonlarinin yuzde seksenini olusturmakta ancak yetersiz ele alinmaktadir.","kanit":"Beef supply chain = 80%+ of emissions inadequately targeted","agirlik":3},{"taktik":"Future-Tense Promises","aciklama":"2050 net sifir hedefi sigir eti tedariki icin somut 2030 taahhudu icermemektedir.","kanit":"Net zero 2050 without beef Scope 3 milestones","agirlik":3}],"sektor_kirmizi_cizgiler":[{"baslik":"Sigir Eti Scope 3","durum":"Eksik","aciklama":"En buyuk emisyon kaynagi icin mutlak azaltim hedefi bulunmamaktadir."},{"baslik":"Ormansizlasma Riski","durum":"Kısmen","aciklama":"Sigir eti tedarikinde ormansizlasma politikalari mevcut ancak dogrulama yetersizdir."}],"eksik_bilgiler":["Sigir eti tedarik zinciri Scope 3 mutlak azaltim hedefi"],"gercek_soru":"McDonalds emisyonlarinin yuzde seksenini olusturan sigir eti tedariki icin 2030 a kadar hangi somut azaltim hedefleri belirlenmistir?","_sources":[{"title":"McDonalds Sustainability","url":"https://corporate.mcdonalds.com"}]},
+  "toyota":{"sirket_adi":"Toyota","sektor":"Otomotiv","verdict":"Şüpheli","manipulasyon_skoru":58,"ozet":"Toyota hibrit teknolojisinin onculeri olmakla birlikte tam elektrikli arac gecisinde sektorun gerisinde kalmaktadir. Iklim politikalarina karsi lobicilik faaliyetleri surdurulebilirlik taahhuduyle celismektedir.","tespit_edilen_taktikler":[{"taktik":"Misleading Framing","aciklama":"Toyota lobicilik yoluyla siki emisyon standartlarina karsi cikarken surdurulebilir mobiliteyi savunmaktadir.","kanit":"Lobbying against strict EV mandates while claiming sustainability","agirlik":3},{"taktik":"Vague Language","aciklama":"Multi-pathway yaklasimi EV gecisini geciktirme stratejisi olarak degerlendirilmektedir.","kanit":"Multi-pathway strategy seen as delaying BEV transition","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Tam EV Gecis Hizi","durum":"Eksik","aciklama":"Rakiplerine kiyasla BEV gecis hizi son derece yavastir."},{"baslik":"Emisyon Standardı Lobicilik","durum":"Eksik","aciklama":"Siki emisyon standartlarina karsi lobicilik surmektedir."},{"baslik":"Hibrit Teknoloji","durum":"Mevcut","aciklama":"HEV teknolojisinde sektor oncusudur."}],"eksik_bilgiler":["2030 icin BEV satis orani hedefi"],"gercek_soru":"Toyota multi-pathway stratejisi gec EV gecisini mesrulastirmanin bir yolu mudur?","_sources":[{"title":"Toyota Sustainability","url":"https://global.toyota/en/sustainability/"}]},
+  "walmart":{"sirket_adi":"Walmart","sektor":"Perakende","verdict":"Şüpheli","manipulasyon_skoru":55,"ozet":"Walmart Project Gigaton ile tedarik zinciri emisyonlarinda onemli bir inisiyatif baslatmistir. Ancak gida israfi ve plastik ambalaj konusunda eksiklikler surmektedir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zincirinin alt katmanlarindaki emisyonlar Project Gigaton kapsami disinda kalmaktadir.","kanit":"Tier 2+ suppliers outside Project Gigaton scope","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Project Gigaton","durum":"Mevcut","aciklama":"Tedarik zinciri Scope 3 azaltimi icin sektor oncusu program."},{"baslik":"Plastik Ambalaj","durum":"Kısmen","aciklama":"Azaltim taahhudu mevcut ancak mutlak hedef eksiktir."}],"eksik_bilgiler":["Tedarik zinciri alt katman emisyon verisi","Plastik ambalaj mutlak azaltim hedefi"],"gercek_soru":"Walmart in tedarik zincirindeki en buyuk emisyon kaynaklari Project Gigaton kapsaminda midir?","_sources":[{"title":"Walmart ESG","url":"https://corporate.walmart.com/esgreport"}]},
+  "kfc":{"sirket_adi":"KFC","sektor":"Gida / Tarim","verdict":"Şüpheli","manipulasyon_skoru":59,"ozet":"KFC dev tavuk tedarik zincirinin hayvan refahi, su tuketimi ve ambalaj plastigi konularindaki etkileri konusunda yeterince seffaf degildir. Net sifir taahhudu somut Scope 3 hedefleri icermemektedir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Tavuk yetistirme ve yem uretiminden kaynaklanan Scope 3 emisyonlari toplam etkinin buyuk bolumunu olusturmakta ancak hedeflere dahil edilmemektedir.","kanit":"Livestock supply chain Scope 3 not in targets","agirlik":3},{"taktik":"Vague Language","aciklama":"Surdurulebilir tedarik zinciri ifadesi olculebilir kriter icermemektedir.","kanit":"Sustainable sourcing without measurable criteria","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"Hayvan Refahi","durum":"Kısmen","aciklama":"Hayvan refahi politikalari mevcut ancak bagimsiz denetim sinirlidir."},{"baslik":"Ambalaj Plastigi","durum":"Kısmen","aciklama":"Plastik azaltim programlari mevcut ancak mutlak hedef eksiktir."},{"baslik":"Scope 3 Tedarik","durum":"Eksik","aciklama":"Tavuk yetistirme emisyonlari net sifir hesabina dahil edilmemektedir."}],"eksik_bilgiler":["Tavuk tedarik zinciri Scope 3 mutlak hedef","Su tuketimi azaltim verisi","Plastik ambalaj mutlak azaltim takvimi"],"gercek_soru":"KFC nin milyarlarca tavugun yetistirilmesinden kaynaklanan Scope 3 emisyonlari net sifir planina ne zaman dahil edilecektir?","_sources":[{"title":"Yum Brands Sustainability","url":"https://www.yum.com/wps/portal/yumbrands/Yumbrands/citizenship-sustainability"}]},
+  "nike":{"sirket_adi":"Nike","sektor":"Tekstil / Hizli Moda","verdict":"Şüpheli","manipulasyon_skoru":54,"ozet":"Nike surdurulebilirlik alaninda bazi somut adimlar atmaktadir. Ancak uretimde kullanilan su miktari ve Scope 3 emisyonlari konusunda yetersizlikler surmektedir.","tespit_edilen_taktikler":[{"taktik":"Scope 3 Omissions","aciklama":"Tedarik zinciri uretim emisyonlari icin yeterli mutlak hedef bulunmamaktadir.","kanit":"Manufacturing Scope 3 without absolute targets","agirlik":2}],"sektor_kirmizi_cizgiler":[{"baslik":"SBTi","durum":"Mevcut","aciklama":"Bilim tabanlı emisyon hedefleri onaylanmistir."},{"baslik":"Tedarik Zinciri Su","durum":"Kısmen","aciklama":"Su yonetimi cabalari mevcut ancak mutlak hedefler yetersizdir."}],"eksik_bilgiler":["Tedarik zinciri Scope 3 mutlak azaltim hedefi"],"gercek_soru":"Nike tedarik zincirindeki isçilerin yasam ucreti alip almadigini kac fabrikada bagimsiz olarak dogruluyor?","_sources":[{"title":"Nike Impact Report","url":"https://purpose.nike.com/"}]}
+}
+</script>
+<script type="text/babel">
+const {useState,useEffect,useCallback} = React;
+
+// Load demo data from JSON script tag - no apostrophe issues
+const DEMO = JSON.parse(document.getElementById('demo-data').textContent);
+
+function getDemoResult(company) {
+  const n = company.toLowerCase().trim()
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+  const map = [
+    ['shell','shell'],['zara','zara'],['h&m','h&m'],
+    ['british petroleum','bp'],['tupras','tupras'],
+    ['arcelik','arcelik'],['arçelik','arcelik'],['beko','arcelik'],
+    ['ulker','ulker'],['ülker','ulker'],
+    ['turk hava','thy'],['turkish airlines','thy'],
+    ['garanti','garanti'],['akbank','akbank'],['turkcell','turkcell'],
+    ['migros','migros'],['vestel','vestel'],
+    ['lc waikiki','lcwaikiki'],['lcwaikiki','lcwaikiki'],
+    ['exxon','exxon'],['amazon','amazon'],['google','google'],
+    ['microsoft','microsoft'],['apple','apple'],
+    ['nestle','nestle'],['coca cola','cocacola'],['cocacola','cocacola'],
+    ['unilever','unilever'],['volkswagen','volkswagen'],
+    ['toyota','toyota'],['walmart','walmart'],['ikea','ikea'],
+    ['kfc','kfc'],['nike','nike'],['hsbc','hsbc'],
+    ['mcdonalds','mcdonalds'],['toyota','toyota'],
+    ['orsted','orsted'],['patagonia','patagonia'],
+  ];
+  const exact = [['bp','bp'],['eti','eti'],['mavi','mavi'],['bim','bim'],['thy','thy']];
+  for(const [k,v] of exact){if(n===k||n.startsWith(k+' ')) return DEMO[v]||null;}
+  for(const [k,v] of map){if(n.includes(k)) return DEMO[v]||null;}
+  return null;
+}
+
+/* SECTORS */
+const SECTORS = {
+  '': '🤖 Otomatik Tespit',
+  'tekstil': '👗 Tekstil / Hizli Moda',
+  'enerji': '⚡ Enerji / Petrokimya',
+  'gida': '🌾 Gida / Tarim',
+  'teknoloji': '💻 Teknoloji',
+  'saglik': '🏥 Saglik / Ilac',
+  'finans': '🏦 Finans / Bankacilik',
+  'otomotiv': '🚗 Otomotiv',
+  'insaat': '🏗️ Insaat / GYO',
+  'perakende': '🛒 Perakende',
+  'turizm': '✈️ Turizm / Havacılık',
+};
+
+const SECTOR_CTX = {
+  '': 'Auto-detect sector and apply most relevant criteria.',
+  'tekstil': 'RED FLAGS: No recycled % content, water pollution, untraceable supply chain, no living wage, vague labels vs GOTS/Oeko-Tex. WEIGHT: Scope 3 supply chain=80%+ emissions.',
+  'enerji': 'RED FLAGS: Net zero 2050 no 2030 milestones, renewables <20% capex, missing methane, LNG as clean, no Scope 3 sold fuel=80%+ emissions. WEIGHT: Absolute targets, fossil expansion.',
+  'gida': 'RED FLAGS: Deforestation in supply chain, natural without cert, water/soil not reported, plastic tonnage missing. WEIGHT: Land use, deforestation, plastic.',
+  'teknoloji': 'RED FLAGS: Data center no RECs, e-waste ignored, carbon neutral offsets only, minerals undisclosed, Scope 3 missing. WEIGHT: PUE, renewable %, hardware lifecycle.',
+  'saglik': 'RED FLAGS: Pharma water pollution, single-use plastic ignored, API supply chain untracked. WEIGHT: Pharma waste, plastics.',
+  'finans': 'RED FLAGS: Financed emissions Scope 3 Cat15 not disclosed=ENTIRE IMPACT, ESG fund labels no portfolio carbon. WEIGHT: Financed emissions, TCFD.',
+  'otomotiv': 'RED FLAGS: EV sales <30%, battery supply chain ignored, lobbying against standards. WEIGHT: Fleet emissions, EV pace, battery lifecycle.',
+  'insaat': 'RED FLAGS: Green building no LEED/BREEAM, embodied carbon unreported. WEIGHT: Embodied carbon, energy intensity.',
+  'perakende': 'RED FLAGS: Plastic claims no absolute tonnage, last-mile ignored. WEIGHT: Packaging, logistics.',
+  'turizm': 'RED FLAGS: SAF <5% main solution, offset-only, carbon neutral flight misleads. WEIGHT: Absolute emissions, SAF%, demand management.',
+};
+
+/* GEMINI */
+const MODELS = ['gemini-2.5-flash-lite','gemini-2.5-flash','gemini-2.5-pro'];
+
+async function callModel(apiKey, model, prompt, useSearch, forceJson) {
+  const body = {
+    contents: [{parts: [{text: prompt}]}],
+    generationConfig: {
+      temperature: 0.3, maxOutputTokens: 3000,
+      ...(forceJson && !useSearch ? {responseMimeType:'application/json'} : {})
+    },
+    ...(useSearch ? {tools:[{googleSearch:{}}]} : {})
+  };
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}
+  );
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||`HTTP ${res.status}`);}
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  const chunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks||[];
+  const sources = chunks.map(c=>({title:c?.web?.title||'',url:c?.web?.uri||''})).filter(s=>s.url);
+  return {text, sources};
+}
+
+async function geminiSearch(apiKey, prompt, onStep) {
+  let lastErr;
+  for(const model of MODELS){
+    try{
+      onStep&&onStep(`${model} ile aranıyor...`);
+      const r = await callModel(apiKey, model, prompt, true, false);
+      if(r.text){onStep&&onStep('Arama tamamlandı ✓');return r;}
+    }catch(e){lastErr=e;}
+  }
+  throw lastErr||new Error('Arama basarisiz');
+}
+
+async function geminiJson(apiKey, prompt, onStep) {
+  let lastErr;
+  for(const model of MODELS){
+    for(const fj of [true,false]){
+      try{
+        onStep&&onStep(`${model} analiz ediyor...`);
+        const r = await callModel(apiKey, model, prompt, false, fj);
+        const s = r.text.replace(/```json/gi,'').replace(/```/g,'').trim();
+        const start = s.indexOf('{'), end = s.lastIndexOf('}');
+        if(start===-1||end===-1) continue;
+        const parsed = JSON.parse(s.slice(start,end+1));
+        onStep&&onStep('Analiz tamamlandı ✓');
+        return parsed;
+      }catch(e){lastErr=e;}
+    }
+  }
+  throw new Error('Analiz basarisiz: '+(lastErr?.message||''));
+}
+
+function buildPrompt(company, sector, research, extra, urls) {
+  return `You are a senior ESG analyst specializing in greenwashing detection.
+COMPANY: ${company}
+SECTOR: ${SECTOR_CTX[sector]||SECTOR_CTX['']}
+RESEARCH: ${research}
+${urls?`USER URL: ${urls}`:''}
+${extra?`USER TEXT: ${extra}`:''}
+Return ONLY raw JSON no markdown:
+{"sirket_adi":"${company}","sektor":"<Turkish>","verdict":"Greenwashing" or "Şüpheli" or "Temiz","manipulasyon_skoru":<0-100>,"tespit_edilen_taktikler":[{"taktik":"<n>","aciklama":"<Turkish>","kanit":"<evidence>","agirlik":<1-3>}],"sektor_kirmizi_cizgiler":[{"baslik":"<Turkish>","durum":"Eksik" or "Kısmen" or "Mevcut","aciklama":"<Turkish>"}],"eksik_bilgiler":["<Turkish>"],"gercek_soru":"<Turkish>","ozet":"<2 sentences Turkish>"}`;
+}
+
+/* SCORE RING */
+function Ring({score}) {
+  const r=37, circ=2*Math.PI*r;
+  const offset=circ-(score/100)*circ;
+  const color=score>65?'var(--r)':score>35?'var(--y)':'var(--g)';
+  return(
+    <div className="ring">
+      <svg viewBox="0 0 88 88" width="88" height="88">
+        <circle cx="44" cy="44" r={r} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="6"/>
+        <circle cx="44" cy="44" r={r} fill="none" stroke={color} strokeWidth="6"
+          strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
+          style={{transition:'stroke-dashoffset 1.2s ease'}}/>
+      </svg>
+      <div className="rv" style={{color}}>{score}</div>
+    </div>
+  );
+}
+
+/* TOPBAR */
+function TopBar({onHome,onHistory,onCompare,histCount}) {
+  return(
+    <div className="bar">
+      <div className="logo" onClick={onHome}>⬡ GW-DEDEKTİF</div>
+      <div style={{display:'flex',gap:4}}>
+        <button className="nb" onClick={onCompare}>Karşılaştır</button>
+        <button className="nb" onClick={onHistory}>Geçmiş{histCount>0&&<span style={{color:'var(--g)',marginLeft:4}}>{histCount}</span>}</button>
+      </div>
+    </div>
+  );
+}
+
+/* HOME */
+function Home({onAnalyze,error,onCompare}) {
+  const [key,setKey]=useState('AIzaSyD_mHjapq4X3ohDG2F4nUqvD0eC4q8J9sg');
+  const [company,setCompany]=useState('');
+  const [sector,setSector]=useState('');
+  const [extra,setExtra]=useState('');
+  const [urls,setUrls]=useState('');
+  const [showExtra,setShowExtra]=useState(false);
+  const ready=key.trim()&&company.trim();
+  const submit=()=>{
+    if(!ready)return;
+    localStorage.setItem('gw_key',key.trim());
+    onAnalyze({apiKey:key.trim(),company:company.trim(),extra,sector,urls});
+  };
+  return(
+    <div className="page">
+      <div className="scan"/>
+      <div className="box">
+        <div style={{textAlign:'center',marginBottom:28}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:8,padding:'4px 12px',borderRadius:99,background:'rgba(57,255,20,.08)',border:'1px solid var(--b2)',marginBottom:14}}>
+            <span style={{width:6,height:6,borderRadius:'50%',background:'var(--g)',display:'inline-block'}} className="fl"/>
+            <span className="mono" style={{color:'var(--g)',fontSize:11}}>5 ADIMLI AI AGENT · 10 SEKTÖR</span>
+          </div>
+          <h1 style={{fontFamily:'Syne,sans-serif',fontSize:'clamp(32px,7vw,52px)',fontWeight:800,lineHeight:1.05,letterSpacing:'-.02em',marginBottom:10}}>
+            Greenwashing<br/><span style={{color:'var(--g)'}}>Dedektifi</span>
+          </h1>
+          <p style={{color:'var(--m)',fontSize:13,maxWidth:380,margin:'0 auto',lineHeight:1.7}}>
+            Şirketlerin sürdürülebilirlik iddialarını araştır, greenwashing taktiklerini tespit et.
+          </p>
+        </div>
+        <div className="card">
+
+          <div style={{marginBottom:14}}>
+            <label className="lbl">Şirket Adı</label>
+            <input className="inp" type="text" value={company} onChange={e=>setCompany(e.target.value)} placeholder="örn. Shell, Zara, Tüpraş, McDonalds..." onKeyDown={e=>e.key==='Enter'&&ready&&submit()}/>
+          </div>
+          <div style={{marginBottom:16}}>
+            <label className="lbl">Sektör</label>
+            <select className="inp" value={sector} onChange={e=>setSector(e.target.value)}>
+              {Object.entries(SECTORS).map(([k,v])=><option key={k} value={k}>{v}</option>)}
+            </select>
+          </div>
+          <div style={{marginBottom:18}}>
+            <button onClick={()=>setShowExtra(s=>!s)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--m)',display:'flex',alignItems:'center',gap:7,fontSize:12,padding:0,fontFamily:"'DM Mono',monospace"}}>
+              <span style={{display:'inline-flex',alignItems:'center',justifyContent:'center',width:15,height:15,border:'1px solid var(--b2)',borderRadius:3,fontSize:9,color:'var(--g)',transition:'transform .2s',transform:showExtra?'rotate(45deg)':'none'}}>+</span>
+              {showExtra?'ek kaynakları gizle':'kendi kaynağını ekle (opsiyonel)'}
+            </button>
+            {showExtra&&(
+              <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
+                <div>
+                  <label className="lbl">Rapor Linki (URL)</label>
+                  <input className="inp" type="url" value={urls} onChange={e=>setUrls(e.target.value)} placeholder="https://www.sirket.com/surdurulebilirlik-raporu.pdf"/>
+                </div>
+                <div>
+                  <label className="lbl">Metin (opsiyonel)</label>
+                  <textarea className="inp" value={extra} onChange={e=>setExtra(e.target.value)} placeholder="Rapordan bir paragraf yapıştır..."/>
+                </div>
+              </div>
+            )}
+          </div>
+          <button className="btn bp" disabled={!ready} onClick={submit}>ARAŞTIR VE ANALİZ ET →</button>
+          <div style={{marginTop:10,textAlign:'center'}}>
+            <button className="btn bg bsm" style={{width:'auto'}} onClick={onCompare}>⚖️ İki Şirketi Karşılaştır</button>
+          </div>
+        </div>
+        <p className="mono" style={{textAlign:'center',marginTop:14,color:'var(--m)',fontSize:11}}>Gemini AI · Web Grounding · 5-Step Agent · 50+ Şirket Demo</p>
+      </div>
+      {error&&<div className="toast">⚠ {error}</div>}
+    </div>
+  );
+}
+
+/* ANALYZING */
+function Analyzing({company,streamText,currentStep}) {
+  const steps=[
+    {i:'🌐',l:'WEB ARAŞTIRMASI',d:'Güncel haberler ve ESG raporları taranıyor'},
+    {i:'🏭',l:'SEKTÖR TESPİTİ',d:'Sektör belirleniyor, kırmızı çizgiler yükleniyor'},
+    {i:'🔬',l:'TAKTİK ANALİZİ',d:'Greenwashing kalıpları tespit ediliyor'},
+    {i:'📊',l:'SKOR HESAPLAMA',d:'Güven seviyeleri ve ağırlıklı skor üretiliyor'},
+    {i:'🪪',l:'RAPOR HAZIRLANIYOR',d:'Kimlik kartı hazırlanıyor'},
+  ];
+  return(
+    <div className="page">
+      <div className="box">
+        <div style={{textAlign:'center',marginBottom:32}}>
+          <div style={{fontSize:34,marginBottom:10}} className="spin">⬡</div>
+          <div style={{fontFamily:'Syne,sans-serif',fontSize:22,fontWeight:800}}>Agent Çalışıyor</div>
+          <div className="mono" style={{color:'var(--m)',marginTop:5}}>{company}</div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          {steps.map((s,i)=>{
+            const st=i<currentStep?'dn':i===currentStep?'ac':'wt';
+            return(
+              <div key={i} className={`si ${st}`}>
+                <span style={{fontSize:17,flexShrink:0}}>{s.i}</span>
+                <div style={{flex:1}}>
+                  <div className="mono" style={{color:st==='ac'?'var(--g)':'var(--m)',marginBottom:2,letterSpacing:'.05em',fontSize:11}}>{s.l}</div>
+                  <div style={{fontSize:12,color:st==='ac'?'var(--t)':'var(--m)'}}>{s.d}</div>
+                  {st==='ac'&&streamText&&<div className="mono" style={{color:'var(--gd)',fontSize:11,marginTop:4}}>{streamText}</div>}
+                </div>
+                {st==='dn'&&<span style={{color:'var(--g)',fontSize:13}}>✓</span>}
+                {st==='ac'&&<span className="spin" style={{color:'var(--g)',fontSize:11}}>◌</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* RESULT */
+function Result({result,company,onReset}) {
+  if(!result)return null;
+  const score=result.manipulasyon_skoru||0;
+  const verdict=result.verdict||'Şüpheli';
+  const bc=verdict==='Greenwashing'?'br':verdict==='Temiz'?'bgg':'by';
+  const sc=score>65?'var(--r)':score>35?'var(--y)':'var(--g)';
+  const vi=verdict==='Greenwashing'?'🚨':verdict==='Temiz'?'🌿':'⚠️';
+  const qr=`https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(window.location.href)}&bgcolor=070d07&color=39ff14&margin=6`;
+
+  const downloadReport = () => {
+    const txt = `GREENWASHING DEDEKTİFİ - ANALİZ RAPORU\n${'='.repeat(50)}\nŞirket: ${company}\nSektör: ${result.sektor||'-'}\nKarar: ${verdict}\nSkor: ${score}/100\nTarih: ${new Date().toLocaleDateString('tr-TR')}\n${'='.repeat(50)}\nÖZET\n${result.ozet||''}\n\nTEKTİKLER\n${(result.tespit_edilen_taktikler||[]).map(t=>`• ${t.taktik}: ${t.aciklama}`).join('\n')}\n\nEKSİK BİLGİLER\n${(result.eksik_bilgiler||[]).map(i=>`- ${i}`).join('\n')}\n\nGERÇEK SORU\n${result.gercek_soru||''}`;
+    const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${company.replace(/\s+/g,'-').toLowerCase()}-rapor.txt`;
+    a.click();
+  };
+
+  return(
+    <div style={{padding:'72px 16px 48px',display:'flex',flexDirection:'column',alignItems:'center'}}>
+      <div className="box">
+        <div style={{textAlign:'center',marginBottom:22}} className="fu">
+          <div className="mono" style={{color:'var(--m)',marginBottom:7,letterSpacing:'.06em',fontSize:11}}>
+            ANALİZ RAPORU · {new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})}
+          </div>
+          <h1 style={{fontFamily:'Syne,sans-serif',fontSize:'clamp(24px,6vw,40px)',fontWeight:800,letterSpacing:'-.02em',marginBottom:10}}>{company}</h1>
+          <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap'}}>
+            <span className={`bdg ${bc}`}>{vi} {verdict.toUpperCase()}</span>
+            {result.sektor&&<span className="bdg bm">🏭 {result.sektor}</span>}
+          </div>
+        </div>
+
+        <div className="card fu" style={{marginBottom:10}}>
+          <div style={{display:'flex',alignItems:'center',gap:18,flexWrap:'wrap'}}>
+            <Ring score={score}/>
+            <div style={{flex:1,minWidth:150}}>
+              <div className="lbl">Manipülasyon Skoru</div>
+              <div style={{fontFamily:'Syne,sans-serif',fontSize:34,fontWeight:800,color:sc,lineHeight:1}}>{score}<span style={{fontSize:15,color:'var(--m)',fontWeight:400}}>/100</span></div>
+              <div style={{marginTop:7,height:4,borderRadius:99,background:'rgba(255,255,255,.06)',overflow:'hidden'}}>
+                <div style={{height:'100%',borderRadius:99,background:sc,width:`${score}%`,transition:'width 1.2s ease'}}/>
+              </div>
+            </div>
+          </div>
+          {result.ozet&&<><div className="div"/><p style={{fontSize:13,lineHeight:1.7}}>{result.ozet}</p></>}
+        </div>
+
+        {result.tespit_edilen_taktikler?.length>0&&(
+          <div className="card fu" style={{marginBottom:10}}>
+            <div className="stit" style={{color:'rgba(255,64,64,.7)'}}>🚩 Tespit Edilen Taktikler ({result.tespit_edilen_taktikler.length})</div>
+            {result.tespit_edilen_taktikler.map((t,i)=>{
+              const cc=t.agirlik===3?'var(--r)':t.agirlik===2?'var(--y)':'var(--g)';
+              return(
+                <div key={i} className="tact">
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
+                    <div style={{fontFamily:'Syne,sans-serif',fontSize:12,fontWeight:700,color:'rgba(255,100,100,.9)'}}>{t.taktik}</div>
+                    <span className="mono" style={{color:cc,fontSize:10}}>{t.agirlik===3?'KRİTİK':t.agirlik===2?'ORTA':'DÜŞÜK'}</span>
+                  </div>
+                  <div style={{fontSize:12,color:'var(--t)',lineHeight:1.6,marginBottom:3}}>{t.aciklama}</div>
+                  {t.kanit&&<div className="mono" style={{color:'var(--m)',fontStyle:'italic',borderLeft:'2px solid rgba(255,184,0,.25)',paddingLeft:8,fontSize:11}}>{t.kanit}</div>}
+                  <div style={{marginTop:5,height:3,borderRadius:99,background:'rgba(255,255,255,.07)',overflow:'hidden'}}>
+                    <div style={{height:'100%',borderRadius:99,background:cc,width:`${t.agirlik/3*100}%`,transition:'width 1s ease'}}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {result.sektor_kirmizi_cizgiler?.length>0&&(
+          <div className="card fu" style={{marginBottom:10}}>
+            <div className="stit" style={{color:'rgba(255,184,0,.7)'}}>🏭 Sektör Kırmızı Çizgileri{result.sektor&&` · ${result.sektor}`}</div>
+            {result.sektor_kirmizi_cizgiler.map((item,i)=>{
+              const sc2=item.durum==='Mevcut'?'var(--g)':item.durum==='Kısmen'?'var(--y)':'var(--r)';
+              const si=item.durum==='Mevcut'?'✓':item.durum==='Kısmen'?'~':'✗';
+              return(
+                <div key={i} style={{display:'flex',gap:10,marginBottom:11,alignItems:'flex-start'}}>
+                  <div style={{flexShrink:0,width:20,height:20,borderRadius:4,background:`${sc2}1a`,border:`1px solid ${sc2}44`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,color:sc2,fontWeight:700}}>{si}</div>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:600,marginBottom:2}}>{item.baslik}</div>
+                    <div style={{fontSize:11,color:'var(--m)',lineHeight:1.5}}>{item.aciklama}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {result.eksik_bilgiler?.length>0&&(
+          <div className="card fu" style={{marginBottom:10}}>
+            <div className="stit" style={{color:'rgba(79,195,247,.7)'}}>❓ Eksik Bilgiler</div>
+            {result.eksik_bilgiler.map((item,i)=>(
+              <div key={i} style={{display:'flex',gap:8,marginBottom:7,fontSize:12,color:'rgba(232,245,232,.7)',lineHeight:1.5}}>
+                <span style={{color:'#4fc3f7',flexShrink:0}}>—</span>{item}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {result.gercek_soru&&(
+          <div className="card fu" style={{marginBottom:10,borderColor:'rgba(57,255,20,.18)'}}>
+            <div className="stit" style={{color:'var(--gd)'}}>💡 Kaçınılan Gerçek Soru</div>
+            <p style={{fontSize:13,fontStyle:'italic',lineHeight:1.75}}>"{result.gercek_soru}"</p>
+          </div>
+        )}
+
+        <div className="card fu" style={{marginBottom:10}}>
+          <div className="stit">🪪 Sürdürülebilirlik Kimlik Kartı</div>
+          <div style={{background:'linear-gradient(135deg,#0a1a0a,#0d2010)',border:'1px solid rgba(57,255,20,.2)',borderRadius:12,padding:20}}>
+            <div style={{display:'flex',justifyContent:'space-between'}}>
+              <div>
+                <div className="lbl" style={{marginBottom:2}}>ŞİRKET</div>
+                <div style={{fontFamily:'Syne,sans-serif',fontSize:19,fontWeight:800}}>{company}</div>
+                <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:4}}>
+                  {result.sektor&&<div className="mono" style={{color:'var(--m)',fontSize:11}}>SEKTÖR <span style={{color:'var(--t)',marginLeft:6}}>{result.sektor}</span></div>}
+                  <div className="mono" style={{color:'var(--m)',fontSize:11}}>KARAR <span style={{color:verdict==='Greenwashing'?'var(--r)':verdict==='Temiz'?'var(--g)':'var(--y)',marginLeft:6,fontWeight:600}}>{verdict.toUpperCase()}</span></div>
+                  <div className="mono" style={{color:'var(--m)',fontSize:11}}>SKOR <span style={{color:sc,marginLeft:6}}>{score}/100</span></div>
+                  <div className="mono" style={{color:'var(--m)',fontSize:11}}>TARİH <span style={{color:'var(--t)',marginLeft:6}}>{new Date().toLocaleDateString('tr-TR')}</span></div>
+                </div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontSize:30}}>{vi}</div>
+                <div className="mono" style={{color:'rgba(57,255,20,.25)',marginTop:5,lineHeight:1.3,fontSize:10}}>GW<br/>DEDEKTİF</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {result._sources?.length>0&&(
+          <div className="card fu" style={{marginBottom:10}}>
+            <div className="stit" style={{color:'rgba(79,195,247,.6)'}}>🔗 Analiz Kaynakları</div>
+            <div className="mono" style={{color:'var(--m)',marginBottom:10,fontSize:11}}>Bu analiz aşağıdaki güncel kaynaklara dayanmaktadır.</div>
+            {result._sources.map((s,i)=>(
+              <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                style={{display:'flex',gap:10,marginBottom:7,textDecoration:'none',padding:'7px 10px',borderRadius:7,border:'1px solid var(--b)',background:'rgba(57,255,20,.02)',transition:'.2s'}}>
+                <span style={{color:'#4fc3f7',flexShrink:0,fontSize:13}}>↗</span>
+                <div style={{minWidth:0}}>
+                  <div style={{fontSize:12,color:'var(--t)',marginBottom:1,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.title||'Kaynak'}</div>
+                  <div className="mono" style={{color:'var(--m)',fontSize:10,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{s.url}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+
+        <div className="card fu" style={{marginBottom:10}}>
+          <div className="stit" style={{textAlign:'center'}}>📱 Paylaş ve İndir</div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <img src={qr} alt="QR" style={{borderRadius:8,border:'1px solid var(--b)',width:72,height:72}}/>
+              <div className="mono" style={{color:'var(--g)',wordBreak:'break-all',maxWidth:180,fontSize:10}}>{window.location.href}</div>
+            </div>
+            <button className="btn bg bsm" onClick={downloadReport}>📄 Raporu İndir</button>
+          </div>
+        </div>
+
+        <button className="btn bg" style={{width:'100%'}} onClick={onReset}>← Yeni Analiz</button>
+      </div>
+    </div>
+  );
+}
+
+/* COMPARE */
+function Compare({onBack}) {
+  const [key,setKey]=useState('AIzaSyD_mHjapq4X3ohDG2F4nUqvD0eC4q8J9sg');
+  const [c1,setC1]=useState('');const [s1,setS1]=useState('');
+  const [c2,setC2]=useState('');const [s2,setS2]=useState('');
+  const [results,setResults]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [loadTxt,setLoadTxt]=useState('');
+  const [err,setErr]=useState('');
+
+  const run=async()=>{
+    if(!key.trim()||!c1.trim()||!c2.trim())return;
+    setLoading(true);setResults(null);setErr('');
+    localStorage.setItem('gw_key',key.trim());
+    try{
+      const analyze=async(company,sector)=>{
+        const demo=getDemoResult(company);
+        if(demo)return demo;
+        const sr=await geminiSearch(key.trim(),`Search for recent ESG news and greenwashing allegations about "${company}".`,t=>setLoadTxt(`${company}: ${t}`));
+        const prompt=buildPrompt(company,sector,sr.text,'','');
+        return await geminiJson(key.trim(),prompt,t=>setLoadTxt(`${company}: ${t}`));
+      };
+      const [r1,r2]=await Promise.all([analyze(c1,s1),analyze(c2,s2)]);
+      setResults([r1,r2]);
+    }catch(e){setErr(e.message);}
+    setLoading(false);
+  };
+
+  const sc=s=>s>65?'var(--r)':s>35?'var(--y)':'var(--g)';
+  const bc=v=>v==='Greenwashing'?'br':v==='Temiz'?'bgg':'by';
+
+  return(
+    <div className="page">
+      <div className="box">
+        <div style={{marginBottom:22}}>
+          <button className="btn bg bsm" style={{width:'auto',marginBottom:14}} onClick={onBack}>← Geri</button>
+          <div style={{fontFamily:'Syne,sans-serif',fontSize:24,fontWeight:800,marginBottom:4}}>Şirket Karşılaştırma</div>
+        </div>
+        <div className="card" style={{marginBottom:14}}>
+
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:14}}>
+            {[[c1,setC1,s1,setS1,'Şirket 1','örn. Shell'],[c2,setC2,s2,setS2,'Şirket 2','örn. BP']].map(([c,sc2,s,ss,lbl,ph],idx)=>(
+              <div key={idx}>
+                <label className="lbl">{lbl}</label>
+                <input className="inp" value={c} onChange={e=>sc2(e.target.value)} placeholder={ph} style={{marginBottom:8}}/>
+                <select className="inp" value={s} onChange={e=>ss(e.target.value)}>
+                  {Object.entries(SECTORS).map(([k,v])=><option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+            ))}
+          </div>
+          <button className="btn bp" disabled={loading||!key.trim()||!c1.trim()||!c2.trim()} onClick={run}>
+            {loading?`⬡ ${loadTxt||'Analiz ediliyor...'}`:'KARŞILAŞTIR →'}
+          </button>
+        </div>
+        {results&&(
+          <div className="fu">
+            <div className="card" style={{marginBottom:10}}>
+              <div className="stit">📊 Skor Karşılaştırması</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+                {results.map((r,i)=>(
+                  <div key={i} style={{textAlign:'center',padding:'12px 0'}}>
+                    <div style={{fontFamily:'Syne,sans-serif',fontSize:14,fontWeight:700,marginBottom:10}}>{i===0?c1:c2}</div>
+                    <Ring score={r.manipulasyon_skoru||0}/>
+                    <div style={{marginTop:8}}><span className={`bdg ${bc(r.verdict)}`}>{r.verdict}</span></div>
+                  </div>
+                ))}
+              </div>
+              <div style={{height:1,background:'var(--b)',margin:'12px 0'}}/>
+              <div style={{fontSize:12,color:'var(--m)',lineHeight:1.7}}>
+                {(()=>{
+                  const d=(results[0].manipulasyon_skoru||0)-(results[1].manipulasyon_skoru||0);
+                  if(d>0)return <><span style={{color:'var(--t)',fontWeight:600}}>{c1}</span>, {c2} kıyasında daha yüksek greenwashing riski ({d} puan fark).</>;
+                  if(d<0)return <><span style={{color:'var(--t)',fontWeight:600}}>{c2}</span>, {c1} kıyasında daha yüksek greenwashing riski ({Math.abs(d)} puan fark).</>;
+                  return <>Her iki şirket eşit risk taşıyor.</>;
+                })()}
+              </div>
+            </div>
+            <div className="card" style={{marginBottom:10}}>
+              <div className="stit">💡 Kaçınılan Sorular</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+                {results.map((r,i)=>(
+                  <div key={i}>
+                    <div style={{fontFamily:'Syne,sans-serif',fontSize:12,fontWeight:700,marginBottom:6,color:'var(--m)'}}>{i===0?c1:c2}</div>
+                    <div style={{fontSize:11,fontStyle:'italic',lineHeight:1.65}}>"{r.gercek_soru}"</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="btn bg" style={{width:'100%'}} onClick={()=>setResults(null)}>← Yeni Karşılaştırma</button>
+          </div>
+        )}
+      </div>
+      {err&&<div className="toast">⚠ {err}</div>}
+    </div>
+  );
+}
+
+/* HISTORY */
+function History({history,onSelect,onBack,onClear}) {
+  const sc=s=>s>65?'var(--r)':s>35?'var(--y)':'var(--g)';
+  const vi=v=>v==='Greenwashing'?'🚨':v==='Temiz'?'🌿':'⚠️';
+  return(
+    <div className="page">
+      <div className="box">
+        <div style={{marginBottom:22}}>
+          <button className="btn bg bsm" style={{width:'auto',marginBottom:14}} onClick={onBack}>← Geri</button>
+          <div style={{fontFamily:'Syne,sans-serif',fontSize:24,fontWeight:800,marginBottom:4}}>Analiz Geçmişi</div>
+          <div style={{fontSize:12,color:'var(--m)'}}>{history.length} kayıtlı analiz</div>
+        </div>
+        {history.length===0&&<div className="card" style={{textAlign:'center',padding:40}}><div style={{fontSize:28,marginBottom:10}}>📭</div><div style={{color:'var(--m)',fontSize:13}}>Henüz analiz yapılmadı.</div></div>}
+        {history.map((item,i)=>(
+          <div key={i} className="hist" onClick={()=>onSelect(item)}>
+            <div>
+              <div style={{fontFamily:'Syne,sans-serif',fontWeight:700,marginBottom:2,fontSize:14}}>{item.company}</div>
+              <div className="mono" style={{color:'var(--m)',fontSize:11}}>{item.date}{item.sector&&` · ${item.sector}`}</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span style={{fontFamily:'Syne,sans-serif',fontWeight:800,color:sc(item.score),fontSize:17}}>{item.score}</span>
+              <span style={{fontSize:14}}>{vi(item.verdict)}</span>
+            </div>
+          </div>
+        ))}
+        {history.length>0&&<button className="btn bg" style={{marginTop:6,color:'var(--r)',borderColor:'rgba(255,64,64,.3)'}} onClick={onClear}>Geçmişi Temizle</button>}
+      </div>
+    </div>
+  );
+}
+
+/* APP */
+function App() {
+  const [page,setPage]=useState('/');
+  const [ctx,setCtx]=useState(null);
+  const [result,setResult]=useState(null);
+  const [error,setError]=useState('');
+  const [streamText,setStreamText]=useState('');
+  const [currentStep,setCurrentStep]=useState(0);
+  const [history,setHistory]=useState(()=>{try{return JSON.parse(localStorage.getItem('gw_history')||'[]');}catch{return [];}});
+
+  const saveHistory=(company,r)=>{
+    const item={company,score:r.manipulasyon_skoru||0,verdict:r.verdict||'Şüpheli',sector:r.sektor||'',date:new Date().toLocaleDateString('tr-TR'),result:r};
+    const updated=[item,...history].slice(0,20);
+    setHistory(updated);
+    localStorage.setItem('gw_history',JSON.stringify(updated));
+  };
+
+  const handleAnalyze=useCallback(async({apiKey,company,extra,sector,urls})=>{
+    setCtx({company,sector});
+    setResult(null);setError('');setStreamText('');setCurrentStep(0);
+    localStorage.setItem('gw_key',apiKey);
+    setPage('/analiz');
+
+    // Check demo first
+    const demo=getDemoResult(company);
+    if(demo){
+      setCurrentStep(0);setStreamText('Demo verisi yükleniyor...');
+      await new Promise(r=>setTimeout(r,700));
+      setCurrentStep(1);setStreamText('Sektör kriterleri yüklendi ✓');
+      await new Promise(r=>setTimeout(r,500));
+      setCurrentStep(2);setStreamText('Greenwashing taktikleri analiz ediliyor...');
+      await new Promise(r=>setTimeout(r,800));
+      setCurrentStep(3);setStreamText('Skor hesaplanıyor...');
+      await new Promise(r=>setTimeout(r,600));
+      setCurrentStep(4);setStreamText('Rapor hazır ✓');
+      await new Promise(r=>setTimeout(r,400));
+      saveHistory(company,demo);
+      setResult(demo);
+      setPage('/sonuc');
+      return;
+    }
+
+    try{
+      setCurrentStep(0);
+      const sr=await geminiSearch(apiKey,`Search for recent ESG reports, sustainability claims and greenwashing allegations about "${company}". Focus on carbon commitments, scope 3, certifications, controversies.`,t=>setStreamText(t));
+      setCurrentStep(1);setStreamText('Sektör kriterleri yüklendi ✓');
+      await new Promise(r=>setTimeout(r,500));
+      setCurrentStep(2);setStreamText('');
+      await new Promise(r=>setTimeout(r,15000)); // rate limit
+      const prompt=buildPrompt(company,sector,sr.text,extra,urls);
+      const parsed=await geminiJson(apiKey,prompt,t=>{setStreamText(t);setCurrentStep(3);});
+      setCurrentStep(4);setStreamText('Rapor hazır ✓');
+      await new Promise(r=>setTimeout(r,400));
+      const withSources={...parsed,_sources:sr.sources||[]};
+      saveHistory(company,withSources);
+      setResult(withSources);
+      setPage('/sonuc');
+    }catch(e){
+      const isQuota = e.message&&e.message.includes('quota');
+      setError(isQuota
+        ? 'API kotasi doldu. Demo şirketlerden birini dene: Shell, Zara, H&M, BP, Orsted, Patagonia, Tupras, Arcelik, THY, Garanti, Akbank, BIM, Migros, Vestel, LC Waikiki, Mavi, ExxonMobil, Amazon, Google, Microsoft, Apple, Nestle, Coca-Cola, Volkswagen, Unilever, IKEA, HSBC, McDonalds, Toyota, Walmart, Nike, KFC'
+        : e.message||'Bir hata olustu.');
+      setPage('/');
+    }
+  },[history]);
+
+  const reset=()=>{setResult(null);setError('');setPage('/');};
+
+  return(
+    <>
+      <TopBar onHome={reset} onHistory={()=>setPage('/gecmis')} onCompare={()=>setPage('/karsilastir')} histCount={history.length}/>
+      {page==='/'&&<Home onAnalyze={handleAnalyze} error={error} onCompare={()=>setPage('/karsilastir')}/>}
+      {page==='/analiz'&&!result&&<Analyzing company={ctx?.company||'...'} streamText={streamText} currentStep={currentStep}/>}
+      {page==='/sonuc'&&result&&<Result result={result} company={ctx?.company||''} onReset={reset}/>}
+      {page==='/karsilastir'&&<Compare onBack={reset}/>}
+      {page==='/gecmis'&&<History history={history} onSelect={item=>{setResult(item.result);setCtx({company:item.company});setPage('/sonuc');}} onBack={reset} onClear={()=>{setHistory([]);localStorage.removeItem('gw_history');}}/>}
+      {page==='/sonuc'&&!result&&<Home onAnalyze={handleAnalyze} error={error} onCompare={()=>setPage('/karsilastir')}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
